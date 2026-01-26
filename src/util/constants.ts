@@ -1,0 +1,10 @@
+export const canvasDimensions = [1024, 768];
+export const gridSize = 32;
+export const outsideGridPos = [ -10, -10 ];
+export const nearbyDistance = gridSize / 4;
+export const wireThickness = 2;
+export const highlightColor = "orange";
+export const paleGrey = "rgb(200,200,200)"
+export const paleGreen = "rgba(0, 255, 0, 0.5)"
+export const lineGrey = "#444"
+export const IC_STORAGE = "saved-ics"
