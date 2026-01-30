@@ -15,7 +15,8 @@ export const appStore = {
     hoveredElementId: null as number | null,
     isDragging: false,
     path: [] as number[][],
-    ticker: null as null | number
+    ticker: null as null | number,
+    ctx: null as null | CanvasRenderingContext2D
 };
 
 export function clearStates() {

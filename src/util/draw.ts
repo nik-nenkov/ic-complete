@@ -131,7 +131,8 @@ export function drawPath(ctx: CanvasRenderingContext2D, path: number[][], color:
     }
 }
 
-export function redrawAll(ctx: CanvasRenderingContext2D): void {
+export function redrawAll(): void {
+    let ctx = appStore.ctx!;
     drawGrid(ctx, canvasDimensions);
     appStore.currentCircuit.wires.forEach(wire => {
         drawWire(ctx, wire);

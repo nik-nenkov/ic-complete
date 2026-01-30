@@ -1,3 +1,5 @@
+@use './variables' as *;
+
 @mixin button-style($bg, $color, $hover-bg, $hover-color) {
   background: $bg;
   color: $color;
