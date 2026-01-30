@@ -28,7 +28,7 @@ export default function Landing() {
             Plan real-world electrical installations for buildings and field
             work.
           </p>
-          <button>Open</button>
+          <Link to="/floor-planning"><button>Open</button></Link>
         </div>
 
         <div className="card">

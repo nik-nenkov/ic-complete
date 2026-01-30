@@ -16,7 +16,12 @@ export const appStore = {
     isDragging: false,
     path: [] as number[][],
     ticker: null as null | number,
-    ctx: null as null | CanvasRenderingContext2D
+    ctx: null as null | CanvasRenderingContext2D,
+    floorItems: [] as any[],
+    previewFloorItem: null as null | any,
+    zoom : 1,   // 100% zoom
+    offset : [0, 0], // for future panning
+    gridSize : 20,   // base grid size in pixels
 };
 
 export function clearStates() {

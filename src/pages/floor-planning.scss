@@ -1,0 +1,54 @@
+.floorplan {
+  display: flex;
+  height: 100vh;
+
+  .sidebar {
+    width: 250px;
+    background: #f4f4f4;
+    padding: 10px;
+    overflow-y: auto;
+
+    .section {
+      margin-bottom: 10px;
+
+      .section-header {
+        font-weight: bold;
+        cursor: pointer;
+        margin-bottom: 5px;
+      }
+
+      .section-content {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+
+        &.open {
+          display: flex;
+        }
+
+        button {
+          padding: 5px 10px;
+          border: 1px solid #ccc;
+          background: white;
+          cursor: pointer;
+          &:hover {
+            background: #ddd;
+          }
+        }
+      }
+    }
+  }
+
+  .canvas-container {
+    flex: 1;
+    background: #fff;
+    border-left: 1px solid #ccc;
+    position: relative;
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  }
+}
