@@ -1,9 +1,9 @@
-import { Pin } from "../model/pin.js";
-import { Connector, Wire } from "../model/wire.js";
+import { Pin } from "../model/logic/pin.js";
+import { Connector, Wire } from "../model/logic/wire.js";
 import { canvasDimensions, highlightColor, lineGrey, paleGreen, wireThickness } from "./constants.js";
 import { gridSize } from "./constants.js";
 import { appStore } from "../storage/state.js"
-import { Element } from "../model/element.js";
+import { Element } from "../model/logic/element.js";
 
 export function drawGrid(ctx: CanvasRenderingContext2D, canvasDimensions: number[]): void {
     ctx!.clearRect(0, 0, canvasDimensions[0], canvasDimensions[1]);

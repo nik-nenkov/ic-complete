@@ -1,8 +1,8 @@
-import { sumArr } from "../util/helper";
+import { sumArr } from "../../util/helper";
 import { Element, ElementKind } from "./element";
-import { Gate } from "./gate";
-import { Pin } from "./pin";
-import { Connector, ConnectorType, Wire } from "./wire";
+import { Gate } from "../logic/gate";
+import { Pin } from "../logic/pin";
+import { Connector, ConnectorType, Wire } from "../logic/wire";
 
 export class IntegratedCircuit extends Element {
     public elements: Element[] = [];

@@ -1,7 +1,7 @@
-import { IntegratedCircuit } from "../model/circuit";
-import { Connector } from "../model/wire";
+import { IntegratedCircuit } from "../model/logic/circuit";
+import { Connector } from "../model/logic/wire";
 import { outsideGridPos } from "../util/constants";
-import { Element } from "../model/element";
+import { Element } from "../model/logic/element";
 
 export const appStore = {
     currentCircuit: new IntegratedCircuit(0, "CIRCUIT", outsideGridPos),

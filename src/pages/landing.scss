@@ -1,0 +1,60 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+
+.landing {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  .hero {
+    padding: $space-lg $space-md;
+    text-align: center;
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: $space-sm;
+      color: $accent-gold;
+    }
+
+    p {
+      max-width: 700px;
+      margin: 0 auto;
+      color: $text-muted;
+      line-height: 1.6;
+    }
+  }
+
+  .choices {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: $space-md;
+    padding: $space-md;
+    flex: 1;
+
+    .card {
+      background: $bg-panel;
+      border: 1px solid rgba(156, 122, 46, 0.3);
+      padding: $space-md;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      h2 { color: $accent-orange; margin-bottom: $space-xs; }
+      p { color: $text-muted; line-height: 1.5; flex: 1; }
+
+      button {
+        @include button-style(transparent, $accent-gold, $accent-gold, $bg-main);
+        margin-top: $space-md;
+      }
+    }
+  }
+
+  .footer {
+    text-align: center;
+    padding: $space-sm;
+    font-size: 0.85rem;
+    color: $text-muted;
+    border-top: 1px solid rgba(156, 122, 46, 0.2);
+  }
+}

@@ -1,5 +1,5 @@
 import { appStore, clearStates } from "../storage/state";
-import { Wire } from "../model/wire.js";
+import { Wire } from "../model/logic/wire.js";
 import { gridSize } from "./constants.js";
 import { redrawAll } from "./draw";
 

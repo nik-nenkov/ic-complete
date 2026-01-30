@@ -1,4 +1,4 @@
-import { sumArr } from "../util/helper";
+import { sumArr } from "../../util/helper";
 import { Element, ElementKind } from "./element";
 import { Connector, ConnectorType } from "./wire";
 

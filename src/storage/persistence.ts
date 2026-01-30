@@ -1,4 +1,4 @@
-import { IntegratedCircuit } from "../model/circuit"
+import { IntegratedCircuit } from "../model/logic/circuit"
 import { IC_STORAGE } from "../util/constants"
 
 export function saveCircuitAsName(ic: IntegratedCircuit, name: string): void {

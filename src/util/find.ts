@@ -1,6 +1,6 @@
 import { appStore } from "../storage/state";
 import { gridSize, nearbyDistance } from "./constants.js";
-import { Connector } from "../model/wire.js";
+import { Connector } from "../model/logic/wire.js";
 
 export function findHoveredConnector(mousePos: number[]): Connector | null {
     for (let element of appStore.currentCircuit.elements) {

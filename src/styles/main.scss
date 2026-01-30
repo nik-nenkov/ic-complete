@@ -1,0 +1,25 @@
+@import './variables';
+@import './mixins';
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: $font-main;
+  background: $bg-main;
+  color: $text-main;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: $radius-sm;
+  transition: all 0.2s;
+}
+
+input {
+  font-family: inherit;
+  border-radius: $radius-sm;
+}
