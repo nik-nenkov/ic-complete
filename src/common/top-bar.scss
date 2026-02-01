@@ -1,0 +1,27 @@
+/* topbar.scss */
+.topbar {
+  height: 50px;
+  background: #2c3e50;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  justify-content: space-between;
+
+  .logo {
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .menu-buttons button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background: #34495e;
+    border: none;
+    color: white;
+    cursor: pointer;
+    &:hover {
+      background: #3d566e;
+    }
+  }
+}

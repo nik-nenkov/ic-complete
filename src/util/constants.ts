@@ -1,6 +1,6 @@
 export const canvasDimensions = [1024, 768];
 export const gridSize = 32;
-export const outsideGridPos = [ -10, -10 ];
+export const outsideGridPos = [ -999, -999 ];
 export const nearbyDistance = gridSize / 4;
 export const wireThickness = 2;
 export const highlightColor = "orange";

@@ -1,17 +1,33 @@
+import {
+  EEType,
+  ElectricalElement,
+} from "../model/electrical/ElectricalElement";
 import { appStore } from "../storage/state";
 
 // Draw all floor plan elements on the canvas
 export function redrawAllFloorPlan() {
   const ctx = appStore.ctx;
   if (!ctx) return;
+  const gridSize = appStore.gridSize * appStore.zoom;
 
-  const zoom = appStore.zoom || 1;
-  const offsetX = appStore.offset?.[0] || 0;
-  const offsetY = appStore.offset?.[1] || 0;
-  const baseGridSize = appStore.gridSize || 20;
+  const imageMap = new Map<EEType, CanvasImageSource>();
 
-  const gridSize = baseGridSize * zoom;
+  function preloadEEImages() {
+    const entries: Record<EEType, string> = {
+      [EEType.R]: "images/R.png",
+      [EEType.L]: "images/L.png",
+      [EEType.C]: "images/C.png",
+    };
 
+    for (const type of Object.values(EEType)) {
+      const img = new Image();
+      img.src = entries[type];
+      imageMap.set(type, img);
+    }
+  }
+
+  // call once, at startup
+  preloadEEImages();
   // Clear canvas
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -19,85 +35,79 @@ export function redrawAllFloorPlan() {
   ctx.strokeStyle = "#eee";
   for (let x = 0; x < ctx.canvas.width; x += gridSize) {
     ctx.beginPath();
-    ctx.moveTo(x + offsetX, 0 + offsetY);
-    ctx.lineTo(x + offsetX, ctx.canvas.height + offsetY);
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, ctx.canvas.height);
     ctx.stroke();
   }
+  ctx.reset;
   for (let y = 0; y < ctx.canvas.height; y += gridSize) {
     ctx.beginPath();
-    ctx.moveTo(0 + offsetX, y + offsetY);
-    ctx.lineTo(ctx.canvas.width + offsetX, y + offsetY);
+    ctx.moveTo(0, y);
+    ctx.lineTo(ctx.canvas.width, y);
     ctx.stroke();
   }
+  ctx.reset;
 
   // Draw each floor plan element
-  appStore.floorItems.forEach((el: any) => {
-    ctx.save();
-    ctx.translate(el.position[0] * zoom + offsetX, el.position[1] * zoom + offsetY);
-
-    const sizeFactor = zoom; // scale elements
+  appStore.floorItems.forEach((el: ElectricalElement) => {
     switch (el.type) {
-      case "Wall":
-        ctx.fillStyle = "#888";
-        ctx.fillRect(0, 0, 80 * sizeFactor, 10 * sizeFactor);
-        break;
-      case "Door":
-        ctx.fillStyle = "#654321";
-        ctx.fillRect(0, 0, 40 * sizeFactor, 10 * sizeFactor);
-        break;
-      case "Window":
-        ctx.fillStyle = "#00f";
-        ctx.fillRect(0, 0, 40 * sizeFactor, 5 * sizeFactor);
-        break;
-      case "Socket":
-        ctx.fillStyle = "#f00";
-        ctx.beginPath();
-        ctx.arc(0, 0, 5 * sizeFactor, 0, Math.PI * 2);
-        ctx.fill();
-        break;
-      case "Switch":
-        ctx.fillStyle = "#0f0";
-        ctx.fillRect(0, 0, 10 * sizeFactor, 10 * sizeFactor);
-        break;
-      case "Wire":
-        if (el.from && el.to) {
-          ctx.strokeStyle = "#000";
-          ctx.lineWidth = 2 * sizeFactor;
+      case EEType.R:
+      case EEType.L:
+      case EEType.C: {
+        const size = 2 * gridSize;
+        const img = imageMap.get(el.type) ?? new Image();
+        ctx.drawImage(
+          img,
+          Number(el.position[0]) * gridSize,
+          Number(el.position[1]) * gridSize,
+          size,
+          size,
+        );
+        el.getConnectors()?.forEach((c) => {
           ctx.beginPath();
-          ctx.moveTo(el.from[0] * zoom + offsetX, el.from[1] * zoom + offsetY);
-          ctx.lineTo(el.to[0] * zoom + offsetX, el.to[1] * zoom + offsetY);
-          ctx.stroke();
-        }
-        break;
-      case "Electrical Box":
-        ctx.fillStyle = "#ff0";
-        ctx.fillRect(0, 0, 30 * sizeFactor, 30 * sizeFactor);
-        break;
-    }
+          ctx.arc(
+            Number(el.position[0]) * gridSize,
+            Number(el.position[1]) * gridSize,
+            2,
+            0,
+            Math.PI * 2,
+          );
 
-    ctx.restore();
+          ctx.fillStyle = "white";
+          ctx.fill();
+
+          ctx.strokeStyle =
+            appStore.hoveredElementId == Number(el.id) ? "orange" : "black";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        });
+        break;
+      }
+    }
   });
 
   // Draw preview element (following mouse)
   if (appStore.previewFloorItem) {
     const el = appStore.previewFloorItem;
-    ctx.save();
-    ctx.translate(el.position[0] * zoom + offsetX, el.position[1] * zoom + offsetY);
-    ctx.globalAlpha = 0.5;
-    ctx.fillStyle = "#aaa";
-    ctx.fillRect(0, 0, 30 * zoom, 30 * zoom); // simple preview
-    ctx.restore();
+    ctx.fillStyle = "#232323";
+    ctx.fillRect(
+      Number(el.position[0]) * gridSize,
+      Number(el.position[1]) * gridSize,
+      2 * gridSize,
+      2 * gridSize,
+    );
   }
-
-  // Draw scale at top-right corner
-  ctx.save();
-  ctx.fillStyle = "#000";
-  ctx.font = "14px Arial";
-
-  // Example conversion: 1 grid unit = 0.5 meters
-  const metersPerGrid = 0.5;
-  const scaleMeters = (baseGridSize * zoom) / baseGridSize * metersPerGrid;
-  ctx.fillText(`Scale: 1:${1000 / scaleMeters}`, ctx.canvas.width - 120, 20);
-
-  ctx.restore();
+  drawRedDot();
+}
+function drawRedDot() {
+  appStore.ctx!.fillStyle = "#f00";
+  appStore.ctx!.beginPath();
+  appStore.ctx!.arc(
+    appStore.gridPointer[0],
+    appStore.gridPointer[1],
+    5,
+    0,
+    Math.PI * 2,
+  );
+  appStore.ctx!.fill();
 }

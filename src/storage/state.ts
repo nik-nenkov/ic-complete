@@ -2,6 +2,7 @@ import { IntegratedCircuit } from "../model/logic/circuit";
 import { Connector } from "../model/logic/wire";
 import { outsideGridPos } from "../util/constants";
 import { Element } from "../model/logic/element";
+import { ElectricalElement } from "../model/electrical/ElectricalElement";
 
 export const appStore = {
     currentCircuit: new IntegratedCircuit(0, "CIRCUIT", outsideGridPos),
@@ -17,8 +18,8 @@ export const appStore = {
     path: [] as number[][],
     ticker: null as null | number,
     ctx: null as null | CanvasRenderingContext2D,
-    floorItems: [] as any[],
-    previewFloorItem: null as null | any,
+    floorItems: [] as ElectricalElement[],
+    previewFloorItem: null as null | ElectricalElement,
     zoom : 1,   // 100% zoom
     offset : [0, 0], // for future panning
     gridSize : 20,   // base grid size in pixels

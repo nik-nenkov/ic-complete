@@ -33,3 +33,22 @@ export function findHoverElementId(mousePos: number[]): number | null {
         return false;
     }).pop()?.id??null;
 }
+
+export function findHoverEElementId(mousePos: number[]): number | null {
+    return Number(appStore.floorItems.filter(element=>{
+        // const elementPos = [element.position[0] / appStore.zoom, element.position[1] / appStore.zoom];
+        const elementCorner = [
+            (Number(element.position[0]) + 2),
+            (Number(element.position[1]) + 2),
+        ]
+        if (
+            mousePos[0]>element.position[0]
+            &&mousePos[1]>element.position[1]
+            &&mousePos[0]<elementCorner[0]
+            &&mousePos[1]<elementCorner[1]
+        ) {
+            return true;
+        }
+        return false;
+    }).pop()?.id??null);
+}

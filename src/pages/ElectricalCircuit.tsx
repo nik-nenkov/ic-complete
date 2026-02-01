@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { appStore, clearStates } from "../storage/state";
+import { appStore } from "../storage/state";
 import { redrawAllFloorPlan } from "../util/draw-floorplan";
-import { mouseCanvasPosition, mouseDownInEditMode } from "../util/mouse";
-import "./floor-planning.scss";
-import { multiplyArr } from "../util/helper";
+import "./electrical-circuit.scss";
+import { multiplyArr, sumArr } from "../util/helper";
+import { EEType, ElectricalElement } from "../model/electrical/ElectricalElement";
+import { outsideGridPos } from "../util/constants";
+import { findHoverEElementId, findHoverElementId } from "../util/find";
+import { mouseCanvasPosition, mouseGridPosition } from "../util/mouse";
 
-export default function FloorPlanning() {
+export default function ElectricalCircuit() {
   const [openSections, setOpenSections] = useState({
     structural: true,
     wiring: true,
@@ -16,44 +19,34 @@ export default function FloorPlanning() {
   const wiringRef = useRef<HTMLDivElement>(null);
   const panelsRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const outside:bigint[] = [-999n,-999n]
 
   const toggleOpen = (section: keyof typeof openSections) => {
     setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
   const renderButtons = () => {
-    // if (structuralRef.current) {
-    //   structuralRef.current.innerHTML = "";
-    //   ["Wall", "Door", "Window"].forEach((item) => {
-    //     const btn = document.createElement("button");
-    //     btn.innerText = item;
-    //     btn.onclick = () =>
-    //       (appStore.previewFloorItem = { type: item, position: [0, 0] });
-    //     structuralRef.current!.appendChild(btn);
-    //   });
-    // }
+    if (structuralRef.current) {
+      structuralRef.current.innerHTML = "";
+      Object.values(EEType).forEach((item) => {
+        const btn = document.createElement("button");
+        btn.innerText = item;
+        btn.onclick = () =>
+          (appStore.previewFloorItem = new ElectricalElement(item,outside));
+        structuralRef.current!.appendChild(btn);
+      });
+    }
 
-    // if (wiringRef.current) {
-    //   wiringRef.current.innerHTML = "";
-    //   ["Socket", "Switch", "Wire"].forEach((item) => {
-    //     const btn = document.createElement("button");
-    //     btn.innerText = item;
-    //     btn.onclick = () =>
-    //       (appStore.previewFloorItem = { type: item, position: [0, 0] });
-    //     wiringRef.current!.appendChild(btn);
-    //   });
-    // }
-
-    // if (panelsRef.current) {
-    //   panelsRef.current.innerHTML = "";
-    //   ["Electrical Box"].forEach((item) => {
-    //     const btn = document.createElement("button");
-    //     btn.innerText = item;
-    //     btn.onclick = () =>
-    //       (appStore.previewFloorItem = { type: item, position: [0, 0] });
-    //     panelsRef.current!.appendChild(btn);
-    //   });
-    // }
+    if (wiringRef.current) {
+      wiringRef.current.innerHTML = "";
+      ["Wire"].forEach((item) => {
+        const btn = document.createElement("button");
+        btn.innerText = item;
+        // btn.onclick = () =>
+        //   (appStore.previewFloorItem = { type: item, position: outsideGridPos  });
+        wiringRef.current!.appendChild(btn);
+      });
+    }
   };
 
   useEffect(() => {
@@ -75,8 +68,25 @@ export default function FloorPlanning() {
     const redrawInterval = setInterval(() => redrawAllFloorPlan(), 80);
 
     const handleMouseDown = (e: MouseEvent) => {
-      // appStore.floorItems.push(appStore.previewFloorItem)
-      // appStore.previewFloorItem = {position:[0,0]}
+      console.log(appStore.previewFloorItem)
+      if(e.button==3){appStore.previewFloorItem = null; return;}
+      appStore.floorItems.push(appStore.previewFloorItem!)
+      appStore.hoveredElementId = Number(appStore.previewFloorItem!.id);
+      appStore.previewFloorItem = new ElectricalElement(appStore.previewFloorItem!.type,[
+        BigInt(appStore.gridPointer[0]),
+        BigInt(appStore.gridPointer[1])
+      ])
+    };
+    const handleMouseMove = (e: MouseEvent) => {
+
+      appStore.gridPointer = mouseCanvasPositionSnapped(canvas, e);
+      appStore.hoveredElementId = findHoverEElementId(appStore.gridPointer);
+
+      if (appStore.previewFloorItem)
+        appStore.previewFloorItem.position = [
+      BigInt(appStore.gridPointer[0]),
+      BigInt(appStore.gridPointer[1]),
+      ]
     };
 
     function mouseCanvasPositionSnapped(
@@ -86,30 +96,20 @@ export default function FloorPlanning() {
       const rect = canvas.getBoundingClientRect();
       const zoom = appStore.zoom || 1;
       const gridSize = (appStore.gridSize || 20) * zoom;
-      const offsetX = appStore.offset?.[0] || 0;
-      const offsetY = appStore.offset?.[1] || 0;
 
       // raw mouse position relative to canvas
       const xRaw =
-        ((e.clientX - rect.left) / (rect.right - rect.left)) * canvas.width -
-        offsetX;
+        ((e.clientX - rect.left) / (rect.right - rect.left)) * canvas.width;
       const yRaw =
-        ((e.clientY - rect.top) / (rect.bottom - rect.top)) * canvas.height -
-        offsetY;
+        ((e.clientY - rect.top) / (rect.bottom - rect.top)) * canvas.height;
 
       // snap to nearest grid intersection
       const x = Math.round(xRaw / gridSize) * gridSize;
       const y = Math.round(yRaw / gridSize) * gridSize;
 
-      return [x + offsetX, y + offsetY];
+      return [x, y];
     }
 
-    const handleMouseMove = (e: MouseEvent) => {
-      appStore.gridPointer = mouseCanvasPositionSnapped(canvas, e);
-      // drawRedDot();
-      // if (appStore.previewFloorItem)
-        // appStore.previewFloorItem.position = multiplyArr(appStore.gridPointer,1/appStore.zoom);
-    };
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
@@ -119,6 +119,7 @@ export default function FloorPlanning() {
       appStore.zoom = Math.min(Math.max(appStore.zoom, 0.1), 10);
     };
 
+    canvas.addEventListener("contextmenu", e => e.preventDefault());
     canvas.addEventListener("mousedown", handleMouseDown);
     canvas.addEventListener("mousemove", handleMouseMove);
     canvas.addEventListener("wheel", handleWheel, { passive: false });
@@ -172,16 +173,3 @@ export default function FloorPlanning() {
     </div>
   );
 }
-function drawRedDot() {
-      appStore.ctx!.fillStyle = "#f00"; // color of the dot
-      appStore.ctx!.beginPath();
-      appStore.ctx!.arc(
-        appStore.gridPointer[0],
-        appStore.gridPointer[1],
-        5,
-        0,
-        Math.PI * 2,
-      ); // x=50, y=50, radius=5
-      appStore.ctx!.fill();
-}
-

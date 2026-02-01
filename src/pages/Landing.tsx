@@ -37,7 +37,7 @@ export default function Landing() {
             Create precise electrical schematics with components, signals and
             simulations.
           </p>
-          <button>Open</button>
+          <Link to="/electrical-circuit"><button>Open</button></Link>
         </div>
       </section>
 
